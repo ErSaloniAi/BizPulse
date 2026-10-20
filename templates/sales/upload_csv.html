@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Sales CSV{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="{% url 'sales:sale_list' %}" class="text-decoration-none">Sold Products</a></li>
+                <li class="breadcrumb-item active">Upload CSV</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0"><i class="bi bi-receipt-cutoff me-2 text-primary"></i>Upload Sales Bills CSV</h4>
+        <p class="text-muted small mb-0">Import customer sales from your handwritten bill book or external spreadsheet. Stock will be automatically deducted.</p>
+    </div>
+    <div>
+        <a href="{% url 'sales:sample_csv' %}" class="btn btn-outline-success">
+            <i class="bi bi-download me-1"></i> Download Sample CSV
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-upload me-2 text-primary"></i>Select & Upload File</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Choose Sales CSV File (.csv)</label>
+                        <input type="file" name="csv_file" class="form-control form-control-lg" accept=".csv" required>
+                        <div class="form-text mt-2">
+                            <i class="bi bi-info-circle me-1"></i> Products in the CSV must already exist in your Stock Record with sufficient available quantity. Multiple items with the same Bill Number are automatically grouped.
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-semibold">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Import Sales
+                        </button>
+                        <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-table me-2 text-info"></i>Expected CSV Columns</h6>
+            </div>
+            <div class="card-body p-4 p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Status</th>
+                                <th>Description / Example</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            <tr>
+                                <td><code>Product Name</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>Exact name matching inventory (e.g. <em>Classmate 200 Pgs Ruled Notebook</em>)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Quantity</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>Quantity sold (e.g. <em>4</em>)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Bill Number</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>BILL-1001</em> (auto-generated if empty)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Sale Date</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>YYYY-MM-DD or DD-MM-YYYY (Default: Today)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Customer Name</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>Rahul Verma</em> (Default: Walk-in Customer)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Selling Price Per Unit</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Price charged (Defaults to product's standard price)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Discount Amount</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Discount on this line item (Default: 0.00)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Payment Status</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td><code>paid</code>, <code>partial</code>, or <code>unpaid</code> (Default: paid)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Amount Paid</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Amount collected from customer (Defaults to bill total)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Payment Method</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Cash, UPI, Card, Bank (Default: Cash)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Notes</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>Counter bill</em></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

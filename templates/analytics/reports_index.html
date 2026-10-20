@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Exports{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i>Business Reports & Exports</h4>
+        <p class="text-muted small mb-0">Accurate, database-derived reports with customizable date ranges, CSV export, and printable PDF statements.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- 1. Daily Sales Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-primary-light text-primary me-3">
+                        <i class="bi bi-calendar-day"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Daily Sales Report</h6>
+                        <small class="text-muted">Day-by-day bill collection</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Daily sales totals, discounts given, bills processed, cash collected, and outstanding dues.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'daily_sales' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'daily_sales' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'daily_sales' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Monthly Sales Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-info-subtle text-info me-3">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Monthly Sales Report</h6>
+                        <small class="text-muted">Month-on-month revenue</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Aggregated monthly sales performance, bill volumes, and average ticket size over time.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'monthly_sales' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'monthly_sales' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'monthly_sales' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Profit & Loss Summary -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card border-primary">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-success-subtle text-success me-3">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">P&L Summary Statement</h6>
+                        <small class="text-muted">Financial Health & Margins</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Complete profit and loss statement: Net Revenue, COGS, Gross Profit, Operating Expenses breakdown, and Net Operating Profit.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'pnl_summary' %}" class="btn btn-sm btn-success flex-grow-1">
+                        View Statement &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'pnl_summary' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'pnl_summary' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Product-wise Sales Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-primary-light text-primary me-3">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Product Sales & Profitability</h6>
+                        <small class="text-muted">Item-level performance</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Quantities sold, sales revenue, product COGS, and gross profit margins for every item.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'product_sales' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'product_sales' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'product_sales' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Expense Category Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-warning-subtle text-warning me-3">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Expense Category Report</h6>
+                        <small class="text-muted">Overhead spending analysis</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Itemized operating expenses by category (Rent, Electricity, Salaries, Transport) with percentage contributions.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'expense_category' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'expense_category' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'expense_category' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Purchases Register -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-primary-light text-primary me-3">
+                        <i class="bi bi-cart-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Purchases Register</h6>
+                        <small class="text-muted">Supplier invoices & payments</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Comprehensive log of all stock purchases from distributors, invoice numbers, amounts paid, and supplier balances.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'purchases' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'purchases' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'purchases' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Stock Valuation Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-success-subtle text-success me-3">
+                        <i class="bi bi-boxes"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Stock Valuation Report</h6>
+                        <small class="text-muted">Total inventory assets</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Current stock on hand for every product, unit weighted average cost, and total inventory monetary valuation.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'stock' %}" class="btn btn-sm btn-primary flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'stock' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'stock' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Low-Stock Restocking Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 stat-card border-danger">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-danger-subtle text-danger me-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-danger">Low-Stock Restocking Report</h6>
+                        <small class="text-muted">Actionable reorder list</small>
+                    </div>
+                </div>
+                <p class="text-secondary small flex-grow-1">
+                    Products at or below reorder levels, deficits, primary suppliers, and estimated reordering costs.
+                </p>
+                <div class="d-flex gap-2 mt-3 pt-3 border-top">
+                    <a href="{% url 'analytics:report_detail' 'low_stock' %}" class="btn btn-sm btn-danger flex-grow-1">
+                        View Report &rarr;
+                    </a>
+                    <a href="{% url 'analytics:export_pdf' 'low_stock' %}" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                    <a href="{% url 'analytics:export_csv' 'low_stock' %}" class="btn btn-sm btn-outline-secondary" title="Export CSV">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk CSV Data Entry Section -->
+<div class="card shadow-sm border-0 mt-5 bg-white">
+    <div class="card-header bg-light py-3 border-0">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>Bulk Data Entry via CSV Upload</h5>
+        <small class="text-muted">Digitize your handwritten registers in seconds by uploading CSV files</small>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-4 text-primary mb-2"><i class="bi bi-box-seam"></i></div>
+                        <h6 class="fw-bold mb-1">Stock / Products</h6>
+                        <p class="text-muted small mb-3">Upload opening stock, product names, categories, and prices.</p>
+                    </div>
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'inventory:upload_csv' %}" class="btn btn-sm btn-primary">Upload Stock CSV</a>
+                        <a href="{% url 'inventory:sample_csv' %}" class="btn btn-sm btn-outline-secondary">Download Sample</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-4 text-success mb-2"><i class="bi bi-receipt"></i></div>
+                        <h6 class="fw-bold mb-1">Sold Products</h6>
+                        <p class="text-muted small mb-3">Upload sales bill records and auto-deduct stock.</p>
+                    </div>
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'sales:upload_csv' %}" class="btn btn-sm btn-success">Upload Sales CSV</a>
+                        <a href="{% url 'sales:sample_csv' %}" class="btn btn-sm btn-outline-secondary">Download Sample</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-4 text-info mb-2"><i class="bi bi-cart-plus"></i></div>
+                        <h6 class="fw-bold mb-1">Stock Purchases</h6>
+                        <p class="text-muted small mb-3">Upload supplier invoices and update stock & costs.</p>
+                    </div>
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'purchases:upload_csv' %}" class="btn btn-sm btn-info text-white">Upload Purchases CSV</a>
+                        <a href="{% url 'purchases:sample_csv' %}" class="btn btn-sm btn-outline-secondary">Download Sample</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fs-4 text-warning mb-2"><i class="bi bi-wallet2"></i></div>
+                        <h6 class="fw-bold mb-1">Operating Expenses</h6>
+                        <p class="text-muted small mb-3">Upload rent, bills, tea/snacks, and maintenance.</p>
+                    </div>
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'expenses:upload_csv' %}" class="btn btn-sm btn-warning text-dark">Upload Expenses CSV</a>
+                        <a href="{% url 'expenses:sample_csv' %}" class="btn btn-sm btn-outline-secondary">Download Sample</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

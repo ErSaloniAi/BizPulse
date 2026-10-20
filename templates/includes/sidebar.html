@@ -1,0 +1,70 @@
+<div class="sidebar d-flex flex-column" id="sidebarNav">
+    <div class="brand">
+        <div class="brand-icon">BP</div>
+        <div>
+            <h6 class="mb-0 fw-bold text-primary">BizPulse</h6>
+            <small class="text-muted" style="font-size: 0.72rem;">Stationery Analytics</small>
+        </div>
+    </div>
+
+    <div class="sidebar-heading">Main Menu</div>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="{% url 'analytics:dashboard' %}" class="nav-link {% if request.resolver_match.app_name == 'analytics' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'inventory:product_list' %}" class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}">
+                <i class="bi bi-box-seam"></i> Stock Record
+                {% if low_stock_count > 0 %}
+                    <span class="badge bg-danger ms-auto rounded-pill" title="{{ low_stock_count }} items need restocking">{{ low_stock_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'sales:sale_list' %}" class="nav-link {% if request.resolver_match.app_name == 'sales' %}active{% endif %}">
+                <i class="bi bi-receipt"></i> Sold Products
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'purchases:purchase_list' %}" class="nav-link {% if request.resolver_match.app_name == 'purchases' %}active{% endif %}">
+                <i class="bi bi-cart-plus"></i> Purchases
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'expenses:expense_list' %}" class="nav-link {% if request.resolver_match.app_name == 'expenses' %}active{% endif %}">
+                <i class="bi bi-wallet2"></i> Expenses
+            </a>
+        </li>
+        
+        <div class="sidebar-heading mt-3">Intelligence & Records</div>
+        <li class="nav-item">
+            <a href="{% url 'analytics:reports_index' %}" class="nav-link {% if request.resolver_match.app_name == 'analytics' and request.resolver_match.url_name != 'dashboard' %}active{% endif %}">
+                <i class="bi bi-file-earmark-bar-graph"></i> Reports & Exports
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'accounts:settings' %}" class="nav-link {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="bi bi-gear"></i> Business Settings
+            </a>
+        </li>
+    </ul>
+
+    <div class="p-3 border-top mt-auto">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2 text-primary fw-bold" style="width: 32px; height: 32px; border: 1px solid #cbd5e1;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="overflow-hidden" style="max-width: 120px;">
+                    <div class="fw-semibold text-truncate small">{{ biz_settings.owner_name|default:"Shop Owner" }}</div>
+                    <div class="text-muted text-truncate" style="font-size: 0.7rem;">Personal Mode</div>
+                </div>
+            </div>
+            <a href="{% url 'accounts:settings' %}" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Business Settings">
+                <i class="bi bi-gear"></i>
+            </a>
+        </div>
+    </div>
+</div>

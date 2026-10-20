@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action_title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}" class="text-decoration-none">Stock Record</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ action_title }}</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-dark">{{ action_title }}</h4>
+            </div>
+            <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to List
+            </a>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-white">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-warning d-flex align-items-start mb-4">
+                            <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-warning"></i>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="allow_duplicate" value="true" id="id_allow_duplicate">
+                                    <label class="form-check-label fw-bold text-dark" for="id_allow_duplicate">
+                                        Confirm and save duplicate (I intentionally want to add another item with this name & brand)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <datalist id="categories-datalist">
+                        {% for c in categories %}
+                            <option value="{{ c }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-1"></i>Product Identification</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            <label class="form-label small fw-semibold">Product Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Brand / Manufacturer</label>
+                            {{ form.brand }}
+                            {% if form.brand.errors %}<div class="text-danger small mt-1">{{ form.brand.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Category</label>
+                            {{ form.category }}
+                            <small class="text-muted">Type a category or select from suggestions</small>
+                            {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Supplier / Distributor Name</label>
+                            {{ form.supplier_name }}
+                            {% if form.supplier_name.errors %}<div class="text-danger small mt-1">{{ form.supplier_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-box me-1"></i>Stock & Unit Settings</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Stock Unit <span class="text-danger">*</span></label>
+                            {{ form.unit }}
+                            {% if form.unit.errors %}<div class="text-danger small mt-1">{{ form.unit.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">
+                                {% if is_edit %}Opening Baseline Quantity{% else %}Opening Stock Quantity <span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.opening_quantity }}
+                            {% if form.opening_quantity.help_text %}
+                                <small class="text-muted d-block mt-1">{{ form.opening_quantity.help_text }}</small>
+                            {% endif %}
+                            {% if form.opening_quantity.errors %}<div class="text-danger small mt-1">{{ form.opening_quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Minimum Stock Alert Level</label>
+                            {{ form.minimum_stock_level }}
+                            <small class="text-muted">Low-stock warning threshold</small>
+                            {% if form.minimum_stock_level.errors %}<div class="text-danger small mt-1">{{ form.minimum_stock_level.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-currency-rupee me-1"></i>Pricing & Entry Date</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Purchase Cost Per Unit (₹) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.purchase_cost_per_unit }}
+                            </div>
+                            {% if form.purchase_cost_per_unit.errors %}<div class="text-danger small mt-1">{{ form.purchase_cost_per_unit.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Selling Price Per Unit (₹) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.selling_price_per_unit }}
+                            </div>
+                            {% if form.selling_price_per_unit.errors %}<div class="text-danger small mt-1">{{ form.selling_price_per_unit.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Stock Entry Date <span class="text-danger">*</span></label>
+                            {{ form.stock_entry_date }}
+                            {% if form.stock_entry_date.errors %}<div class="text-danger small mt-1">{{ form.stock_entry_date.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-secondary px-3">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Save Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Business Settings{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-1"><i class="bi bi-gear me-2 text-primary"></i>Business Settings</h4>
+        <p class="text-muted small mb-0">Configure your shop details, low-stock threshold, and account credentials.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-shop me-2"></i>Shop Profile & Defaults</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_settings">
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label class="form-label small fw-semibold">Shop Name <span class="text-danger">*</span></label>
+                            {{ settings_form.shop_name }}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Proprietor / Owner Name</label>
+                            {{ settings_form.owner_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Contact Phone</label>
+                            {{ settings_form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Email Address</label>
+                            {{ settings_form.email }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Shop Address (printed on reports & bills)</label>
+                            {{ settings_form.address }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">GSTIN / Trade License No. (Optional)</label>
+                            {{ settings_form.gstin }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Currency Symbol</label>
+                            {{ settings_form.currency_symbol }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Default Low Stock Alert</label>
+                            {{ settings_form.default_low_stock_threshold }}
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-save me-1"></i> Save Business Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-shield-lock me-2"></i>Change Password</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+                    {% for field in password_form %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">{{ field.label }}</label>
+                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control" required>
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-outline-dark w-100 mt-2 fw-semibold">
+                        <i class="bi bi-key me-1"></i> Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

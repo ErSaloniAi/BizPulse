@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Void Purchase #{{ purchase.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white py-3">
+                <h6 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Voiding Purchase Invoice</h6>
+            </div>
+            <div class="card-body p-4">
+                <p>Are you sure you want to void Purchase from <b>{{ purchase.supplier_name }}</b> (Invoice: {{ purchase.invoice_number|default:purchase.id }})?</p>
+                <div class="alert alert-warning small">
+                    <b>What happens when you void a purchase:</b>
+                    <ul class="mb-0 mt-1">
+                        <li>The purchased quantities will be <b>deducted</b> from current stock.</li>
+                        <li>The purchase record will be marked as <b>Voided</b>, maintaining full audit logs.</li>
+                    </ul>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Reason for Voiding <span class="text-danger">*</span></label>
+                        <input type="text" name="reason" class="form-control" placeholder="e.g. Returned to supplier, invoice canceled" required>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'purchases:purchase_detail' purchase.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger fw-bold">Confirm & Void Purchase</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

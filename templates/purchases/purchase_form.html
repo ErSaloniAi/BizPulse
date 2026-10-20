@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Stock Purchase{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'purchases:purchase_list' %}" class="text-decoration-none">Purchases</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Record Purchase</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart-plus me-2 text-primary"></i>Record Stock Purchase</h4>
+                <small class="text-muted">Receive stock from suppliers to increase inventory and update weighted-average cost</small>
+            </div>
+            <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-white mb-4">
+            <div class="card-body p-4">
+                <form method="post" id="purchaseInvoiceForm" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Invoice Header -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Supplier Invoice / Bill Ref #</label>
+                                {{ form.invoice_number }}
+                                {% if form.invoice_number.errors %}<div class="text-danger small mt-1">{{ form.invoice_number.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Purchase Date <span class="text-danger">*</span></label>
+                                {{ form.purchase_date }}
+                                {% if form.purchase_date.errors %}<div class="text-danger small mt-1">{{ form.purchase_date.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Supplier / Distributor Name <span class="text-danger">*</span></label>
+                                {{ form.supplier_name }}
+                                {% if form.supplier_name.errors %}<div class="text-danger small mt-1">{{ form.supplier_name.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle mb-0" id="purchaseItemsTable">
+                            <thead class="table-light small text-uppercase text-muted">
+                                <tr>
+                                    <th>Product Purchased <span class="text-danger">*</span></th>
+                                    <th style="width: 140px;" class="text-end">Qty Purchased <span class="text-danger">*</span></th>
+                                    <th style="width: 150px;" class="text-end">Cost / Unit <span class="text-danger">*</span></th>
+                                    <th style="width: 140px;" class="text-end">Total Amount</th>
+                                    <th style="width: 50px;" class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseItemsTableBody">
+                                <!-- Dynamic rows inserted by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" id="addPurchaseRowBtn">
+                            <i class="bi bi-plus-lg me-1"></i> Add Another Product Line
+                        </button>
+                        <div class="text-end">
+                            <span class="fs-6 text-muted me-2">Total Invoice Amount:</span>
+                            <span class="fs-4 fw-bold text-primary">₹<span id="purchaseGrandTotalText">0.00</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details Card -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-credit-card me-2"></i>Supplier Payment Details</h6>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Payment Status</label>
+                                {{ form.payment_status }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Amount Paid (₹)</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">₹</span>
+                                    {{ form.amount_paid }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Payment Method</label>
+                                {{ form.payment_method }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-muted d-block">Outstanding to Supplier</label>
+                                <span class="fs-5 fw-bold text-danger">₹<span id="purchaseOutstandingText">0.00</span></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Remarks / Payment Notes</label>
+                                {{ form.notes }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary px-3">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">
+                            <i class="bi bi-check2-circle me-1"></i> Confirm & Update Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% load static %}{% static 'js/dynamic_items.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const productsData = {{ products_json|safe }};
+        initDynamicItems({
+            tableBodyId: 'purchaseItemsTableBody',
+            addRowBtnId: 'addPurchaseRowBtn',
+            grandTotalId: 'purchaseGrandTotalText',
+            amountPaidId: 'id_amount_paid',
+            outstandingId: 'purchaseOutstandingText',
+            paymentStatusId: 'id_payment_status',
+            products: productsData,
+            isSale: false
+        });
+    });
+</script>
+{% endblock %}

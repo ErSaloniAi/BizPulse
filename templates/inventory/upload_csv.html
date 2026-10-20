@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Stock CSV{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}" class="text-decoration-none">Stock Record</a></li>
+                <li class="breadcrumb-item active">Upload CSV</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0"><i class="bi bi-file-earmark-spreadsheet me-2 text-success"></i>Upload Stock / Products CSV</h4>
+        <p class="text-muted small mb-0">Bulk import products and opening stock from your handwritten ledger or spreadsheet.</p>
+    </div>
+    <div>
+        <a href="{% url 'inventory:sample_csv' %}" class="btn btn-outline-success">
+            <i class="bi bi-download me-1"></i> Download Sample CSV
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-upload me-2 text-primary"></i>Select & Upload File</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Choose CSV File (.csv)</label>
+                        <input type="file" name="csv_file" class="form-control form-control-lg" accept=".csv" required>
+                        <div class="form-text mt-2">
+                            <i class="bi bi-info-circle me-1"></i> Make sure your file is formatted as CSV (Comma Separated Values) exported from Excel or Google Sheets.
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-4 fw-semibold">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Import Stock
+                        </button>
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-table me-2 text-info"></i>Expected CSV Columns</h6>
+            </div>
+            <div class="card-body p-4 p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Status</th>
+                                <th>Description / Example</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            <tr>
+                                <td><code>Product Name</code></td>
+                                <td><span class="badge bg-danger">Required</span></td>
+                                <td>e.g. <em>Classmate 200 Pgs Ruled Notebook</em></td>
+                            </tr>
+                            <tr>
+                                <td><code>Brand</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>ITC, Reynolds, Doms, Camel</em></td>
+                            </tr>
+                            <tr>
+                                <td><code>Category</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>Notebooks, Pens, Art Supplies, Files</em></td>
+                            </tr>
+                            <tr>
+                                <td><code>Supplier Name</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>e.g. <em>Vikas Traders</em></td>
+                            </tr>
+                            <tr>
+                                <td><code>Unit</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Piece, Packet, Box, Dozen, Bundle, Ream (Default: Piece)</td>
+                            </tr>
+                            <tr>
+                                <td><code>Opening Quantity</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Initial stock quantity (e.g. <em>50</em>). Default: 0</td>
+                            </tr>
+                            <tr>
+                                <td><code>Purchase Cost Per Unit</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Your buying cost (e.g. <em>45.00</em>). Default: 0</td>
+                            </tr>
+                            <tr>
+                                <td><code>Selling Price Per Unit</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Customer price (e.g. <em>60.00</em>). Default: Cost price</td>
+                            </tr>
+                            <tr>
+                                <td><code>Minimum Stock Level</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>Alert limit (e.g. <em>10</em>). Default: 5</td>
+                            </tr>
+                            <tr>
+                                <td><code>Stock Entry Date</code></td>
+                                <td><span class="badge bg-secondary">Optional</span></td>
+                                <td>YYYY-MM-DD or DD-MM-YYYY (Default: Today)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

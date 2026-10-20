@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Header & Actions -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'analytics:reports_index' %}" class="text-decoration-none">Reports</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0 text-dark">{{ title }}</h4>
+        <div class="text-muted small">
+            Period: <span class="badge bg-primary text-white fw-semibold">{{ period_label }}</span>
+        </div>
+    </div>
+
+    <!-- Export Buttons -->
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'analytics:export_pdf' report_type %}?period={{ period }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-outline-danger btn-sm d-flex align-items-center" target="_blank">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+        </a>
+        <a href="{% url 'analytics:export_csv' report_type %}?period={{ period }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Date Filter Bar -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="card-body py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-1">
+            <span class="text-muted small me-2 fw-semibold">Quick Periods:</span>
+            <a href="?period=today" class="btn btn-sm {% if period == 'today' %}btn-primary{% else %}btn-light border{% endif %}">Today</a>
+            <a href="?period=last_7_days" class="btn btn-sm {% if period == 'last_7_days' %}btn-primary{% else %}btn-light border{% endif %}">Last 7 Days</a>
+            <a href="?period=this_month" class="btn btn-sm {% if period == 'this_month' %}btn-primary{% else %}btn-light border{% endif %}">This Month</a>
+            <a href="?period=previous_month" class="btn btn-sm {% if period == 'previous_month' %}btn-primary{% else %}btn-light border{% endif %}">Previous Month</a>
+        </div>
+
+        <form method="get" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="period" value="custom">
+            <input type="date" name="start_date" class="form-control form-control-sm" value="{{ start_date }}" required>
+            <span class="text-muted small">to</span>
+            <input type="date" name="end_date" class="form-control form-control-sm" value="{{ end_date }}" required>
+            <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+<!-- Report Table -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-uppercase small text-muted">
+                <tr>
+                    {% for h in headers %}
+                        <th class="{% if forloop.first %}ps-4{% endif %} {% if 'Amount' in h or 'Sales' in h or 'Cost' in h or 'Revenue' in h or 'COGS' in h or 'Profit' in h or 'Paid' in h or 'Outstanding' in h or 'Total' in h %}text-end{% endif %}">
+                            {{ h }}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if rows %}
+                    {% for row in rows %}
+                        <tr>
+                            {% for cell in row %}
+                                <td class="{% if forloop.first %}ps-4 fw-semibold{% endif %} {% if forloop.counter > 2 and '₹' in headers|join:'' %}text-end{% endif %}">
+                                    {{ cell }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{{ headers|length }}" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox display-6 d-block mb-2 text-secondary"></i>
+                            No records found for the selected period.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+            {% if summary %}
+                <tfoot class="table-light fw-bold border-top-2">
+                    <tr>
+                        {% for item in summary %}
+                            <td class="{% if forloop.first %}ps-4{% endif %} {% if forloop.counter > 2 and '₹' in headers|join:'' %}text-end{% endif %}">
+                                {{ item }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Low-Stock Restocking List{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}" class="text-decoration-none">Stock Record</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Low-Stock Items</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Low-Stock Restocking List</h4>
+        <div class="text-muted small">
+            Found <b class="text-danger">{{ total_low_stock }}</b> product(s) at or below minimum required inventory.
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'analytics:export_pdf' 'low_stock' %}" class="btn btn-outline-danger btn-sm" target="_blank">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+        </a>
+        <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-cart-plus me-1"></i> Order Stock from Supplier
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 bg-white mb-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small text-uppercase text-muted">
+                <tr>
+                    <th class="ps-3">Code</th>
+                    <th>Product Name & Brand</th>
+                    <th>Supplier</th>
+                    <th class="text-end">Current Stock</th>
+                    <th class="text-end">Minimum Level</th>
+                    <th class="text-end">Deficit</th>
+                    <th class="text-end">Est. Unit Cost</th>
+                    <th class="text-end pe-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if low_stock_items %}
+                    {% for item in low_stock_items %}
+                        <tr>
+                            <td class="ps-3 fw-bold text-muted small">{{ item.product.product_code }}</td>
+                            <td>
+                                <a href="{% url 'inventory:product_detail' item.product.pk %}" class="fw-bold text-dark text-decoration-none">
+                                    {{ item.product.name }}
+                                </a>
+                                {% if item.product.brand %}
+                                    <small class="text-muted d-block">{{ item.product.brand }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.product.supplier_name|default:"-" }}</td>
+                            <td class="text-end fw-bold text-danger">
+                                {{ item.current_stock|floatformat:2 }} {{ item.product.get_unit_display }}
+                            </td>
+                            <td class="text-end text-muted">
+                                {{ item.product.minimum_stock_level|floatformat:2 }} {{ item.product.get_unit_display }}
+                            </td>
+                            <td class="text-end fw-bold text-danger">
+                                -{{ item.deficit|floatformat:2 }}
+                            </td>
+                            <td class="text-end text-muted">
+                                {{ currency_symbol }}{{ item.product.purchase_cost_per_unit|floatformat:2 }}
+                            </td>
+                            <td class="text-end pe-3">
+                                <a href="{% url 'purchases:purchase_create' %}" class="btn btn-sm btn-primary py-0 px-2">
+                                    <i class="bi bi-cart-plus"></i> Reorder
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-success">
+                            <i class="bi bi-check-circle display-5 d-block mb-2 text-success"></i>
+                            <h6 class="fw-bold">All stock levels are healthy!</h6>
+                            <p class="text-muted small">No products currently meet or fall below their configured minimum threshold.</p>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action_title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'expenses:expense_list' %}" class="text-decoration-none">Expenses</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ action_title }}</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-dark">{{ action_title }}</h4>
+            </div>
+            <a href="{% url 'expenses:expense_list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-white">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Expense Category <span class="text-danger">*</span></label>
+                            {{ form.category }}
+                            <small class="text-muted"><a href="{% url 'expenses:category_list' %}" target="_blank">+ Add New Category</a></small>
+                            {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Date <span class="text-danger">*</span></label>
+                            {{ form.date }}
+                            {% if form.date.errors %}<div class="text-danger small mt-1">{{ form.date.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Expense Description / Name <span class="text-danger">*</span></label>
+                        {{ form.description }}
+                        {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Total Amount (₹) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.amount }}
+                            </div>
+                            {% if form.amount.errors %}<div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Payment Status</label>
+                            {{ form.payment_status }}
+                            {% if form.payment_status.errors %}<div class="text-danger small mt-1">{{ form.payment_status.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Amount Actually Paid (₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.amount_paid }}
+                            </div>
+                            <small class="text-muted">If partially paid, enter amount paid so far</small>
+                            {% if form.amount_paid.errors %}<div class="text-danger small mt-1">{{ form.amount_paid.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Payment Method</label>
+                            {{ form.payment_method }}
+                            {% if form.payment_method.errors %}<div class="text-danger small mt-1">{{ form.payment_method.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Paid To (Vendor / Person)</label>
+                            {{ form.paid_to }}
+                            {% if form.paid_to.errors %}<div class="text-danger small mt-1">{{ form.paid_to.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Receipt / Bill Reference No.</label>
+                            {{ form.receipt_reference }}
+                            {% if form.receipt_reference.errors %}<div class="text-danger small mt-1">{{ form.receipt_reference.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Additional Remarks / Notes</label>
+                        {{ form.notes }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'expenses:expense_list' %}" class="btn btn-outline-secondary px-3">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Save Expense
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

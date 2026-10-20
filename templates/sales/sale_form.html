@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}New Sales Bill{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'sales:sale_list' %}" class="text-decoration-none">Bill Book</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">New Bill</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt-cutoff me-2 text-primary"></i>Enter Sales Bill</h4>
+                <small class="text-muted">Digitize a physical bill book entry</small>
+            </div>
+            <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-white mb-4">
+            <div class="card-body p-4">
+                <form method="post" id="salesBillForm" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Bill Header (Physical Bill Book Style) -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Bill Number <span class="text-danger">*</span></label>
+                                {{ form.bill_number }}
+                                {% if form.bill_number.errors %}<div class="text-danger small mt-1">{{ form.bill_number.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Date <span class="text-danger">*</span></label>
+                                {{ form.sale_date }}
+                                {% if form.sale_date.errors %}<div class="text-danger small mt-1">{{ form.sale_date.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">M/s or Customer / Business Name</label>
+                                {{ form.customer_name }}
+                                <small class="text-muted">Leave empty for walk-in retail customer</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle mb-0" id="itemsTable">
+                            <thead class="table-light small text-uppercase text-muted">
+                                <tr>
+                                    <th>Particulars (Select Product) <span class="text-danger">*</span></th>
+                                    <th style="width: 120px;" class="text-end">Qty <span class="text-danger">*</span></th>
+                                    <th style="width: 130px;" class="text-end">Rate / Unit <span class="text-danger">*</span></th>
+                                    <th style="width: 110px;" class="text-end">Discount</th>
+                                    <th style="width: 130px;" class="text-end">Amount</th>
+                                    <th style="width: 50px;" class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <!-- Dynamic rows inserted by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" id="addRowBtn">
+                            <i class="bi bi-plus-lg me-1"></i> Add Another Product Line
+                        </button>
+                        <div class="text-end">
+                            <span class="fs-6 text-muted me-2">Grand Total:</span>
+                            <span class="fs-4 fw-bold text-primary">₹<span id="grandTotalText">0.00</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details Card -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-wallet me-2"></i>Payment Collection Details</h6>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Payment Status</label>
+                                {{ form.payment_status }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Amount Paid (₹)</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">₹</span>
+                                    {{ form.amount_paid }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Payment Method</label>
+                                {{ form.payment_method }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-muted d-block">Outstanding Dues</label>
+                                <span class="fs-5 fw-bold text-danger">₹<span id="outstandingText">0.00</span></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Notes / Reference</label>
+                                {{ form.notes }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary px-3">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">
+                            <i class="bi bi-check2-circle me-1"></i> Save & Record Sales Bill
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% load static %}{% static 'js/dynamic_items.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const productsData = {{ products_json|safe }};
+        initDynamicItems({
+            tableBodyId: 'itemsTableBody',
+            addRowBtnId: 'addRowBtn',
+            grandTotalId: 'grandTotalText',
+            amountPaidId: 'id_amount_paid',
+            outstandingId: 'outstandingText',
+            paymentStatusId: 'id_payment_status',
+            products: productsData,
+            isSale: true
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense Categories{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'expenses:expense_list' %}" class="text-decoration-none">Expenses</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Categories</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-tags me-2 text-primary"></i>Expense Categories</h4>
+        <small class="text-muted">Manage operating expense classifications</small>
+    </div>
+    <a href="{% url 'expenses:expense_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Expenses
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 bg-white">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-plus-circle me-1 text-primary"></i>Add New Category</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Category Name <span class="text-danger">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                        <i class="bi bi-save me-1"></i> Save Category
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0 bg-white">
+            <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0 text-dark">Available Expense Categories ({{ categories.count }})</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Category Name</th>
+                            <th>Type</th>
+                            <th class="text-end pe-3">Expenses Logged</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                            <tr>
+                                <td class="ps-3 fw-bold text-dark">{{ cat.name }}</td>
+                                <td>
+                                    {% if cat.is_default %}
+                                        <span class="badge bg-light text-secondary border">Default</span>
+                                    {% else %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Custom</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-3 text-muted">
+                                    {{ cat.expenses.count }} entries
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Adjustment: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}" class="text-decoration-none">Stock Record</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'inventory:product_detail' product.pk %}" class="text-decoration-none">{{ product.name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Adjust Stock</li>
+                    </ol>
+                </nav>
+                <h4 class="fw-bold mb-0 text-dark">Adjust Stock / Record Damage</h4>
+            </div>
+            <a href="{% url 'inventory:product_detail' product.pk %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-white">
+            <div class="card-body p-4">
+                <div class="alert alert-info py-2 px-3 small mb-4">
+                    Product: <b>{{ product.name }}</b> [{{ product.product_code }}]<br>
+                    Current Stock Balance: <b class="text-dark">{{ current_stock }} {{ product.get_unit_display }}</b>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Adjustment Type <span class="text-danger">*</span></label>
+                        {{ form.adjustment_type }}
+                        {% if form.adjustment_type.errors %}<div class="text-danger small mt-1">{{ form.adjustment_type.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Quantity to Adjust ({{ product.get_unit_display }}) <span class="text-danger">*</span></label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}<div class="text-danger small mt-1">{{ form.quantity.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Adjustment Date <span class="text-danger">*</span></label>
+                            {{ form.date }}
+                            {% if form.date.errors %}<div class="text-danger small mt-1">{{ form.date.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Reason / Reference <span class="text-danger">*</span></label>
+                        {{ form.reason }}
+                        <small class="text-muted">e.g. Physical inventory count correction, Water leakage damage</small>
+                        {% if form.reason.errors %}<div class="text-danger small mt-1">{{ form.reason.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Additional Remarks</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}<div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold">
+                        <i class="bi bi-check-lg me-1"></i> Confirm & Record Stock Adjustment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

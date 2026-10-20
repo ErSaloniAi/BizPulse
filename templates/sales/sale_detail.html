@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Bill #{{ sale.bill_number }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-3 no-print">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'sales:sale_list' %}" class="text-decoration-none">Sold Products</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Bill #{{ sale.bill_number }}</li>
+            </ol>
+        </nav>
+        <h4 class="fw-bold mb-0 text-dark">Sales Bill #{{ sale.bill_number }}</h4>
+    </div>
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-printer me-1"></i> Print Bill
+        </button>
+        {% if sale.status == 'confirmed' %}
+            <a href="{% url 'sales:sale_void' sale.pk %}" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-x-circle me-1"></i> Void Bill
+            </a>
+        {% endif %}
+        <a href="{% url 'sales:sale_list' %}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Bills
+        </a>
+    </div>
+</div>
+
+<!-- Physical Bill Paper Layout -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="bill-paper {% if sale.status == 'voided' %}border-danger{% endif %}">
+            {% if sale.status == 'voided' %}
+                <div class="alert alert-danger py-2 text-center fw-bold mb-3">
+                    <i class="bi bi-x-octagon-fill me-2"></i> THIS BILL HAS BEEN VOIDED / CANCELLED. STOCK HAS BEEN RESTORED.
+                </div>
+            {% endif %}
+
+            <!-- Header -->
+            <div class="text-center pb-3 mb-3 border-bottom">
+                <h3 class="fw-bold mb-1 text-primary">{{ biz_settings.shop_name }}</h3>
+                <p class="text-muted small mb-1">{{ biz_settings.address }}</p>
+                <div class="small text-muted">
+                    {% if biz_settings.phone %}<span>Phone: {{ biz_settings.phone }}</span> | {% endif %}
+                    {% if biz_settings.gstin %}<span>GSTIN: {{ biz_settings.gstin }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Bill Meta Details -->
+            <div class="row mb-3 small">
+                <div class="col-6">
+                    <div><b>Bill No:</b> <span class="fs-6 fw-bold text-dark">{{ sale.bill_number }}</span></div>
+                    <div><b>M/s:</b> {{ sale.customer_name|default:"Walk-in Customer" }}</div>
+                </div>
+                <div class="col-6 text-end">
+                    <div><b>Date:</b> {{ sale.sale_date|date:"d M Y" }}</div>
+                    <div>
+                        <b>Payment Status:</b>
+                        {% if sale.payment_status == 'paid' %}
+                            <span class="badge-paid">Paid</span>
+                        {% elif sale.payment_status == 'partial' %}
+                            <span class="badge-partial">Partial</span>
+                        {% else %}
+                            <span class="badge-unpaid">Unpaid</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered border-secondary-subtle align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 40px;" class="text-center">#</th>
+                            <th>Particulars</th>
+                            <th style="width: 80px;" class="text-end">Qty</th>
+                            <th style="width: 100px;" class="text-end">Rate (₹)</th>
+                            <th style="width: 90px;" class="text-end">Discount</th>
+                            <th style="width: 110px;" class="text-end">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="fw-bold">{{ item.product.name }}</span>
+                                    {% if item.product.brand %}
+                                        <small class="text-muted">({{ item.product.brand }})</small>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">{{ item.quantity_sold|floatformat:2 }} {{ item.product.get_unit_display }}</td>
+                                <td class="text-end">{{ item.actual_selling_price_per_unit|floatformat:2 }}</td>
+                                <td class="text-end text-muted">{{ item.discount_amount|floatformat:2 }}</td>
+                                <td class="text-end fw-bold">{{ item.line_total|floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="fw-bold">
+                        <tr>
+                            <td colspan="5" class="text-end">Total Amount:</td>
+                            <td class="text-end fs-6 text-primary">₹{{ sale.total_amount|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-end text-success">Amount Received:</td>
+                            <td class="text-end text-success">₹{{ sale.amount_paid|floatformat:2 }}</td>
+                        </tr>
+                        {% if sale.outstanding_amount > 0 %}
+                            <tr>
+                                <td colspan="5" class="text-end text-danger">Balance Due:</td>
+                                <td class="text-end text-danger">₹{{ sale.outstanding_amount|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                    </tfoot>
+                </table>
+            </div>
+
+            {% if sale.notes %}
+                <div class="small text-muted p-2 bg-light rounded border mb-3">
+                    <b>Remarks / Note:</b> {{ sale.notes }}
+                </div>
+            {% endif %}
+
+            <!-- Business Intelligence Summary for Shopkeeper (no-print) -->
+            <div class="p-3 bg-light rounded border mt-4 no-print">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <span class="text-muted fw-bold">Internal Profit Analysis for this Bill:</span>
+                    <div>
+                        <span class="me-3">Cost of Goods Sold (COGS): <b>₹{{ cogs|floatformat:2 }}</b></span>
+                        <span class="text-success fw-bold">Gross Profit: <b>₹{{ gross_profit|floatformat:2 }}</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4 pt-3 border-top small text-muted">
+                Thank you for your business! Please visit again.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

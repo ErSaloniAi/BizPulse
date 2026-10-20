@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Expenses Register{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-3">
+    <div>
+        <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-wallet2 me-2 text-primary"></i>Operating Expenses</h4>
+        <p class="text-muted small mb-0">Track all regular and miscellaneous operational expenses for accurate net profit calculations.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'expenses:upload_csv' %}" class="btn btn-outline-success btn-sm d-flex align-items-center">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Upload CSV
+        </a>
+        <a href="{% url 'expenses:category_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-tags me-1"></i> Manage Categories
+        </a>
+        <a href="{% url 'expenses:expense_create' %}" class="btn btn-primary btn-sm d-flex align-items-center">
+            <i class="bi bi-plus-circle me-1"></i> Record Expense
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card p-3 border-0 shadow-sm bg-white">
+            <div class="stat-label">Total Expenses Incurred</div>
+            <div class="stat-value text-dark">{{ currency_symbol }}{{ total_incurred|floatformat:2|intcomma }}</div>
+            <div class="small mt-1 text-muted">Deducted from gross profit</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card p-3 border-0 shadow-sm bg-white">
+            <div class="stat-label">Amount Paid Out</div>
+            <div class="stat-value text-success">{{ currency_symbol }}{{ total_paid|floatformat:2|intcomma }}</div>
+            <div class="small mt-1 text-muted">Actual cash outflow</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card p-3 border-0 shadow-sm bg-white">
+            <div class="stat-label">Outstanding Expense Bills</div>
+            <div class="stat-value text-danger">{{ currency_symbol }}{{ total_outstanding|floatformat:2|intcomma }}</div>
+            <div class="small mt-1 text-muted">Pending payables</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="card-body py-3 px-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search description, recipient..." value="{{ query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if category_id == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="payment_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="paid" {% if payment_filter == 'paid' %}selected{% endif %}>Paid</option>
+                    <option value="partial" {% if payment_filter == 'partial' %}selected{% endif %}>Partially Paid</option>
+                    <option value="unpaid" {% if payment_filter == 'unpaid' %}selected{% endif %}>Unpaid</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-1">
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="{{ start_date }}">
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="{{ end_date }}">
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-sm btn-primary w-100">Go</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Expenses Table -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small text-uppercase text-muted">
+                <tr>
+                    <th class="ps-3">Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Paid To / Ref</th>
+                    <th class="text-end">Amount</th>
+                    <th class="text-end">Paid</th>
+                    <th class="text-end">Outstanding</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end pe-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if page_obj %}
+                    {% for exp in page_obj %}
+                        <tr>
+                            <td class="ps-3 small">{{ exp.date|date:"d-m-Y" }}</td>
+                            <td>
+                                <span class="fw-bold text-dark">{{ exp.description }}</span>
+                                {% if exp.notes %}
+                                    <small class="text-muted d-block">{{ exp.notes }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border">{{ exp.category.name }}</span>
+                            </td>
+                            <td class="small">
+                                {{ exp.paid_to|default:"-" }}
+                                {% if exp.receipt_reference %}
+                                    <span class="text-muted d-block font-monospace" style="font-size: 0.75rem;">Ref: {{ exp.receipt_reference }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold">{{ currency_symbol }}{{ exp.amount|floatformat:2 }}</td>
+                            <td class="text-end text-success">{{ currency_symbol }}{{ exp.amount_paid|floatformat:2 }}</td>
+                            <td class="text-end {% if exp.outstanding_amount > 0 %}text-danger fw-semibold{% else %}text-muted{% endif %}">
+                                {{ currency_symbol }}{{ exp.outstanding_amount|floatformat:2 }}
+                            </td>
+                            <td class="text-center">
+                                {% if exp.payment_status == 'paid' %}
+                                    <span class="badge-paid">Paid</span>
+                                {% elif exp.payment_status == 'partial' %}
+                                    <span class="badge-partial">Partial</span>
+                                {% else %}
+                                    <span class="badge-unpaid">Unpaid</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'expenses:expense_edit' exp.pk %}" class="btn btn-outline-secondary" title="Edit Expense">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'expenses:expense_delete' exp.pk %}" class="btn btn-outline-danger" title="Delete Expense">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-wallet display-6 d-block mb-2 text-secondary"></i>
+                            No expenses recorded.
+                            <div class="mt-2">
+                                <a href="{% url 'expenses:expense_create' %}" class="btn btn-sm btn-primary">Record Your First Expense</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}
